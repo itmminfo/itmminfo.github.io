@@ -1051,6 +1051,14 @@
               <input id="email" name="email" type="email" placeholder="kontakt@firma.pl" required>
             </div>
             <div class="field">
+              <label for="intent">Cel kontaktu</label>
+              <select id="intent" name="intent" required>
+                <option value="process_analysis">Chcę krótką analizę procesu</option>
+                <option value="pakiet_roi">Chcę kupić Pakiet ROI, gdy będzie dostępny</option>
+                <option value="partner_tool">Chcę pokazać kalkulator klientowi lub partnerowi</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="monthlyOrdersLead">Zamówienia miesięcznie</label>
               <input id="monthlyOrdersLead" name="monthlyOrders" type="number" min="0" placeholder="np. 1000">
             </div>
@@ -1125,6 +1133,10 @@
         launchConfig[key] = value;
       }
     });
+    const initialIntent = queryConfig.get("intent");
+    if (initialIntent && document.getElementById("intent")) {
+      document.getElementById("intent").value = initialIntent;
+    }
 
     const pln = new Intl.NumberFormat("pl-PL", {
       style: "currency",
@@ -1355,18 +1367,22 @@
       event.preventDefault();
       const payload = {
         email: document.getElementById("email").value.trim(),
+        intent: document.getElementById("intent").value,
         monthlyOrders: document.getElementById("monthlyOrdersLead").value,
         tools: document.getElementById("tools").value.trim(),
         problem: document.getElementById("problem").value.trim(),
         result: currentResult,
         submittedAt: new Date().toISOString()
       };
-      payload._subject = "Nowy lead: kalkulator kosztu obsługi zamówień";
+      payload._subject = payload.intent === "pakiet_roi"
+        ? "Zainteresowanie zakupem: Pakiet ROI automatyzacji e-commerce"
+        : "Nowy lead: kalkulator kosztu obsługi zamówień";
       payload._template = "table";
       payload._captcha = "false";
       payload._replyto = payload.email;
       payload.message = [
         "Email: " + payload.email,
+        "Cel kontaktu: " + payload.intent,
         "Zamówienia miesięcznie: " + (payload.monthlyOrders || ""),
         "Narzędzia: " + (payload.tools || ""),
         "Problem: " + (payload.problem || ""),
@@ -1379,6 +1395,7 @@
       ].join("\n");
       const formData = new FormData();
       formData.append("email", payload.email);
+      formData.append("intent", payload.intent);
       formData.append("monthlyOrders", payload.monthlyOrders || "");
       formData.append("tools", payload.tools || "");
       formData.append("problem", payload.problem || "");
