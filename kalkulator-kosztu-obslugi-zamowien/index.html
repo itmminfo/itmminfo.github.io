@@ -1044,26 +1044,26 @@
         </div>
         <div id="lead" class="lead-form">
           <h2>Zgłoś proces do analizy</h2>
-          <p class="status-note">Formularz prototypowy. W produkcji podłącz go do CRM, maila lub narzędzia formularzy.</p>
-          <form id="leadForm">
+          <p class="status-note">Formularz wysyła zgłoszenie na kontakt@itmm.info. Przy pierwszym użyciu endpoint może wymagać potwierdzenia w skrzynce.</p>
+          <form id="leadForm" action="https://formsubmit.co/ajax/kontakt@itmm.info" method="POST">
             <div class="field">
               <label for="email">E-mail</label>
-              <input id="email" type="email" placeholder="kontakt@firma.pl" required>
+              <input id="email" name="email" type="email" placeholder="kontakt@firma.pl" required>
             </div>
             <div class="field">
               <label for="monthlyOrdersLead">Zamówienia miesięcznie</label>
-              <input id="monthlyOrdersLead" type="number" min="0" placeholder="np. 1000">
+              <input id="monthlyOrdersLead" name="monthlyOrders" type="number" min="0" placeholder="np. 1000">
             </div>
             <div class="field">
               <label for="tools">Używane narzędzia</label>
-              <input id="tools" type="text" placeholder="Base.com, Allegro, InPost, księgowość...">
+              <input id="tools" name="tools" type="text" placeholder="Base.com, Allegro, InPost, księgowość...">
             </div>
             <div class="field">
               <label for="problem">Największy problem</label>
-              <textarea id="problem" placeholder="Co dziś robicie ręcznie i gdzie najczęściej coś się psuje?"></textarea>
+              <textarea id="problem" name="problem" placeholder="Co dziś robicie ręcznie i gdzie najczęściej coś się psuje?"></textarea>
             </div>
             <label class="checkbox">
-              <input type="checkbox" required>
+              <input name="consent" type="checkbox" value="yes" required>
               <span>Wyrażam zgodę na kontakt w sprawie przesłanego wyniku kalkulatora i opisanego procesu. Wynik kalkulatora jest szacunkiem, nie wyceną wdrożenia.</span>
             </label>
             <button class="button" type="submit">Wyślij wynik do analizy</button>
@@ -1112,7 +1112,7 @@
 
   <script>
     const launchConfig = {
-      formEndpoint: "",
+      formEndpoint: "https://formsubmit.co/ajax/kontakt@itmm.info",
       leadFormUrl: "",
       productCheckoutUrl: "",
       analyticsSource: "kalkulator_kosztu_obslugi_zamowien"
@@ -1361,6 +1361,39 @@
         result: currentResult,
         submittedAt: new Date().toISOString()
       };
+      payload._subject = "Nowy lead: kalkulator kosztu obsługi zamówień";
+      payload._template = "table";
+      payload._captcha = "false";
+      payload._replyto = payload.email;
+      payload.message = [
+        "Email: " + payload.email,
+        "Zamówienia miesięcznie: " + (payload.monthlyOrders || ""),
+        "Narzędzia: " + (payload.tools || ""),
+        "Problem: " + (payload.problem || ""),
+        "Koszt ręczny / mies.: " + (payload.result ? payload.result.manualCost : ""),
+        "Koszt roczny: " + (payload.result ? payload.result.annualCost : ""),
+        "Oszczędność netto / mies.: " + (payload.result ? payload.result.netSavings : ""),
+        "Zwrot w miesiącach: " + (payload.result ? payload.result.paybackMonths : ""),
+        "Segment wyniku: " + (payload.result ? payload.result.tier : ""),
+        "Wysłano: " + payload.submittedAt
+      ].join("\n");
+      const formData = new FormData();
+      formData.append("email", payload.email);
+      formData.append("monthlyOrders", payload.monthlyOrders || "");
+      formData.append("tools", payload.tools || "");
+      formData.append("problem", payload.problem || "");
+      formData.append("manualCost", payload.result ? payload.result.manualCost : "");
+      formData.append("annualCost", payload.result ? payload.result.annualCost : "");
+      formData.append("netSavings", payload.result ? payload.result.netSavings : "");
+      formData.append("paybackMonths", payload.result ? payload.result.paybackMonths : "");
+      formData.append("tier", payload.result ? payload.result.tier : "");
+      formData.append("submittedAt", payload.submittedAt);
+      formData.append("message", payload.message);
+      formData.append("_subject", payload._subject);
+      formData.append("_template", payload._template);
+      formData.append("_captcha", payload._captcha);
+      formData.append("_replyto", payload._replyto);
+      formData.append("_url", window.location.href);
       track("lead_form_submitted", currentResult || {});
 
       if (!launchConfig.formEndpoint) {
@@ -1377,8 +1410,10 @@
       try {
         const response = await fetch(launchConfig.formEndpoint, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          headers: {
+            "Accept": "application/json"
+          },
+          body: formData
         });
 
         if (!response.ok) {

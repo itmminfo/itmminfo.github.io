@@ -12,7 +12,7 @@ Folder: outputs/static-site
 - `sitemap.xml`
 - `_headers` - nagłówki bezpieczeństwa dla Cloudflare Pages.
 - `_redirects` - kanoniczne redirecty na URL-e z końcowym slashem.
-- robocza polityka prywatności i regulamin.
+- polityka prywatności i regulamin dla wersji MVP.
 
 ## Ważne
 
