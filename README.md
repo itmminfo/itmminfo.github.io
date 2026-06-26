@@ -8,6 +8,7 @@ Folder: outputs/static-site
 - `/kalkulator-kosztu-obslugi-zamowien/` - kalkulator ROI.
 - `/pakiet-roi-automatyzacji-ecommerce/` - strona sprzedażowa produktu.
 - `/klub-roi-automatyzacji-ecommerce/` - strona membership MRR z CTA do `intent=klub_roi`.
+- `/klub-roi-automatyzacji-ecommerce/m1-koszt-obslugi-zamowien/` - publiczna próbka pierwszego modułu Klubu ROI.
 - 3 strony SEO wspierające ruch organiczny.
 - `robots.txt`
 - `sitemap.xml`
