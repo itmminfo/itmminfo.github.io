@@ -7,6 +7,7 @@ Folder: outputs/static-site
 - `/` - strona główna kierująca do kalkulatora.
 - `/kalkulator-kosztu-obslugi-zamowien/` - kalkulator ROI.
 - `/pakiet-roi-automatyzacji-ecommerce/` - strona sprzedażowa produktu.
+- `/klub-roi-automatyzacji-ecommerce/` - strona membership MRR z CTA do `intent=klub_roi`.
 - 3 strony SEO wspierające ruch organiczny.
 - `robots.txt`
 - `sitemap.xml`
