@@ -1055,6 +1055,7 @@
               <select id="intent" name="intent" required>
                 <option value="process_analysis">Chcę krótką analizę procesu</option>
                 <option value="pakiet_roi">Chcę kupić Pakiet ROI, gdy będzie dostępny</option>
+                <option value="klub_roi">Chcę dołączyć do Klubu ROI 99 PLN/mies.</option>
                 <option value="partner_tool">Chcę pokazać kalkulator klientowi lub partnerowi</option>
               </select>
             </div>
@@ -1374,9 +1375,11 @@
         result: currentResult,
         submittedAt: new Date().toISOString()
       };
-      payload._subject = payload.intent === "pakiet_roi"
-        ? "Zainteresowanie zakupem: Pakiet ROI automatyzacji e-commerce"
-        : "Nowy lead: kalkulator kosztu obsługi zamówień";
+      const subjectByIntent = {
+        pakiet_roi: "Zainteresowanie zakupem: Pakiet ROI automatyzacji e-commerce",
+        klub_roi: "Zainteresowanie membership: Klub ROI automatyzacji e-commerce"
+      };
+      payload._subject = subjectByIntent[payload.intent] || "Nowy lead: kalkulator kosztu obsługi zamówień";
       payload._template = "table";
       payload._captcha = "false";
       payload._replyto = payload.email;
