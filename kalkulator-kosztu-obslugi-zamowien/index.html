@@ -1,0 +1,1400 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalkulator kosztu obsługi zamówień w e-commerce</title>
+  <meta name="description" content="Policz, ile kosztuje ręczna obsługa zamówień w sklepie internetowym i kiedy automatyzacja Base.com, Allegro, InPost lub KSeF może się zwrócić.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://itmminfo.github.io/kalkulator-kosztu-obslugi-zamowien/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23121f1f'/%3E%3Cpath d='M17 19h30v7H17zM17 29h20v7H17zM17 39h30v7H17z' fill='%23f5b942'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #fbfaf7;
+      --ink: #211f1a;
+      --muted: #676056;
+      --line: #d9d0c2;
+      --panel: #ffffff;
+      --panel-strong: #f3eee5;
+      --teal: #00796b;
+      --teal-dark: #07594f;
+      --amber: #c36d12;
+      --green: #2c7a3f;
+      --red: #b6372c;
+      --blue: #235b8d;
+      --shadow: 0 18px 40px rgba(52, 42, 28, .14);
+      --radius: 8px;
+      --mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: "Aptos", "Segoe UI", Tahoma, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(33, 31, 26, .045) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(33, 31, 26, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 44px 44px;
+      line-height: 1.5;
+    }
+
+    a {
+      color: var(--teal-dark);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      background: rgba(251, 250, 247, .92);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar .shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 62px;
+    }
+
+    .mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .mark-sign {
+      width: 34px;
+      height: 34px;
+      border: 2px solid var(--ink);
+      display: grid;
+      place-items: center;
+      background: var(--amber);
+      color: #fff;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .nav a:hover {
+      color: var(--ink);
+    }
+
+    .hero {
+      padding: 46px 0 26px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr);
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--teal-dark);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 999px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    h1 {
+      margin-top: 18px;
+      font-family: var(--serif);
+      font-size: 54px;
+      max-width: 780px;
+    }
+
+    .lead {
+      margin: 20px 0 0;
+      max-width: 690px;
+      color: #4c473f;
+      font-size: 19px;
+    }
+
+    .anti {
+      margin-top: 18px;
+      padding-left: 14px;
+      border-left: 4px solid var(--amber);
+      max-width: 690px;
+      color: var(--muted);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .button {
+      min-height: 44px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 14px;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 rgba(33, 31, 26, .22);
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .button:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 6px 6px 0 rgba(33, 31, 26, .22);
+    }
+
+    .button.secondary {
+      background: var(--panel);
+      color: var(--ink);
+    }
+
+    .button.teal {
+      background: var(--teal);
+    }
+
+    .button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(0, 121, 107, .35);
+      outline-offset: 2px;
+    }
+
+    .ledger {
+      background: var(--panel);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 100%;
+      overflow: hidden;
+    }
+
+    .ledger-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--ink);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    .ledger-body {
+      padding: 16px;
+    }
+
+    .process-map {
+      display: grid;
+      gap: 10px;
+    }
+
+    .process-row {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+    }
+
+    .row-index {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--ink);
+      font-family: var(--mono);
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .row-text strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .row-text span,
+    .status-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .row-money {
+      font-family: var(--mono);
+      color: var(--red);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .calculator-band {
+      padding: 18px 0 40px;
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: minmax(0, .96fr) minmax(360px, .74fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 28px rgba(52, 42, 28, .08);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      align-items: start;
+    }
+
+    .panel-header h2 {
+      font-size: 24px;
+      font-family: var(--serif);
+    }
+
+    .panel-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .form-grid {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #b9ad9d;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 11px;
+      min-height: 42px;
+    }
+
+    input[type="range"] {
+      accent-color: var(--teal);
+      padding: 0;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .range-line {
+      display: grid;
+      grid-template-columns: 1fr 70px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .result-panel {
+      position: sticky;
+      top: 78px;
+      overflow: hidden;
+    }
+
+    .score-strip {
+      padding: 18px;
+      color: #fff;
+      background: var(--teal-dark);
+    }
+
+    .score-strip.low {
+      background: var(--blue);
+    }
+
+    .score-strip.medium {
+      background: var(--amber);
+    }
+
+    .score-strip.high {
+      background: var(--teal);
+    }
+
+    .score-strip.very-high {
+      background: var(--red);
+    }
+
+    .score-label {
+      font-family: var(--mono);
+      font-size: 13px;
+      opacity: .88;
+    }
+
+    .score {
+      margin-top: 8px;
+      font-family: var(--serif);
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .score-sub {
+      margin-top: 8px;
+      max-width: 420px;
+      font-size: 14px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: var(--paper);
+      min-height: 82px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-family: var(--mono);
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .chart-wrap {
+      padding: 0 14px 14px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 90px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .bar-track {
+      height: 12px;
+      background: #ece5db;
+      overflow: hidden;
+      border-radius: 99px;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: var(--teal);
+      transition: width .24s ease;
+    }
+
+    .bar.errors {
+      background: var(--red);
+    }
+
+    .bar.delays {
+      background: var(--amber);
+    }
+
+    .bar-value {
+      font-family: var(--mono);
+      text-align: right;
+    }
+
+    .result-copy {
+      padding: 0 18px 18px;
+      color: #4b453d;
+    }
+
+    .result-copy p {
+      margin: 0 0 12px;
+    }
+
+    .result-actions {
+      display: grid;
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+
+    .section {
+      padding: 42px 0;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, .36);
+    }
+
+    .section.alt {
+      background: rgba(243, 238, 229, .72);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, .85fr) minmax(260px, .45fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .section h2 {
+      font-family: var(--serif);
+      font-size: 34px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .info-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 16px;
+      min-height: 160px;
+    }
+
+    .info-card h3 {
+      font-size: 19px;
+      margin-bottom: 10px;
+    }
+
+    .info-card p,
+    .info-card li {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .info-card ul {
+      margin: 10px 0 0;
+      padding-left: 19px;
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .8fr) minmax(340px, .65fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .offer {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 20px;
+      box-shadow: 8px 8px 0 rgba(33, 31, 26, .12);
+    }
+
+    .offer .price {
+      font-family: var(--serif);
+      font-size: 40px;
+      margin: 8px 0;
+    }
+
+    .lead-form {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 18px;
+    }
+
+    .lead-form form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .form-note {
+      border: 1px dashed var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      background: var(--paper);
+    }
+
+    .checkbox {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 8px;
+      align-items: start;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .checkbox input {
+      min-height: 0;
+      margin-top: 3px;
+      width: auto;
+      accent-color: var(--teal);
+    }
+
+    details {
+      border-top: 1px solid var(--line);
+      padding: 14px 0;
+    }
+
+    details:first-child {
+      border-top: 0;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    details p {
+      color: var(--muted);
+      margin: 10px 0 0;
+      max-width: 780px;
+    }
+
+    footer {
+      padding: 28px 0 38px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: min(360px, calc(100vw - 36px));
+      border: 2px solid var(--ink);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      transform: translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .2s ease, opacity .2s ease;
+      z-index: 20;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .calculator,
+      .section-head,
+      .cta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-panel {
+        position: static;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      .nav {
+        display: none;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .shell {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .hero {
+        padding-top: 28px;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .lead {
+        font-size: 16px;
+      }
+
+      .form-grid,
+      .metrics,
+      .columns {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-header,
+      .topbar .shell {
+        align-items: start;
+      }
+
+      .bar-row {
+        grid-template-columns: 76px 1fr;
+      }
+
+      .bar-value {
+        grid-column: 2;
+        text-align: left;
+      }
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Kalkulator kosztu obsługi zamówień",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "Kalkulator pomaga oszacować miesięczny koszt ręcznej obsługi zamówień w e-commerce oraz próg opłacalności automatyzacji.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "PLN"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Ile kosztuje obsługa jednego zamówienia w sklepie internetowym?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Koszt zależy od czasu pracy, kosztu godziny, liczby błędów i wyjątków. Kalkulator sumuje koszt pracy, błędów i opóźnień, aby pokazać miesięczny koszt procesu."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Kiedy automatyzacja zamówień się opłaca?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Automatyzacja zaczyna mieć sens, gdy powtarzalny koszt ręcznej pracy i błędów jest wyższy niż koszt narzędzi, kontroli wyjątków i wdrożenia w rozsądnym okresie zwrotu."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Czy Base.com lub BaseLinker wystarczy do automatyzacji?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Często wystarcza do prostych reguł. Jeśli problem dotyczy wyjątków, kilku systemów, raportów, KSeF lub kontroli błędów, zwykle potrzebne jest uporządkowanie procesu ponad standardową konfiguracją panelu."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell">
+      <div class="mark" aria-label="Kalkulator operacyjny">
+        <span class="mark-sign" aria-hidden="true">Σ</span>
+        <span>Koszt Zamówień</span>
+      </div>
+      <nav class="nav" aria-label="Nawigacja strony">
+        <a href="#kalkulator">Kalkulator</a>
+        <a href="#co-liczymy">Co liczymy</a>
+        <a href="#pakiet">Pakiet ROI</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <span class="eyebrow">Narzędzie ROI dla e-commerce</span>
+          <h1>Kalkulator kosztu ręcznej obsługi zamówień</h1>
+          <p class="lead">Wpisz wolumen zamówień, czas pracy i koszt błędów. Zobacz, ile miesięcznie kosztuje ręczna obsługa oraz od jakiej kwoty automatyzacja zaczyna mieć sens.</p>
+          <p class="anti">To nie jest wycena wdrożenia. To szybki model decyzyjny, który pomaga sprawdzić, czy temat w ogóle warto ruszać.</p>
+          <div class="hero-actions">
+            <a class="button teal" href="#kalkulator">Policz koszt procesu</a>
+            <a class="button secondary" href="#pakiet">Zobacz pakiet ROI</a>
+          </div>
+        </div>
+        <aside class="ledger" aria-label="Przykładowy przepływ ręcznej obsługi">
+          <div class="ledger-head">
+            <span>PROCESS LOG</span>
+            <span>MANUAL COST</span>
+          </div>
+          <div class="ledger-body">
+            <div class="process-map">
+              <div class="process-row">
+                <span class="row-index">01</span>
+                <span class="row-text"><strong>Zamówienie</strong><span>kanał, status, płatność</span></span>
+                <span class="row-money">+ czas</span>
+              </div>
+              <div class="process-row">
+                <span class="row-index">02</span>
+                <span class="row-text"><strong>Etykieta</strong><span>adres, punkt, walidacja</span></span>
+                <span class="row-money">+ błędy</span>
+              </div>
+              <div class="process-row">
+                <span class="row-index">03</span>
+                <span class="row-text"><strong>Faktura</strong><span>dane, KSeF, poprawki</span></span>
+                <span class="row-money">+ ryzyko</span>
+              </div>
+              <div class="process-row">
+                <span class="row-index">04</span>
+                <span class="row-text"><strong>Wyjątki</strong><span>zwroty, opóźnienia, maile</span></span>
+                <span class="row-money">+ chaos</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="kalkulator" class="calculator-band">
+      <div class="shell calculator">
+        <form class="panel" id="calculatorForm">
+          <div class="panel-header">
+            <div>
+              <h2>Dane procesu</h2>
+              <p>Zacznij od wartości przybliżonych. Po publikacji ten formularz powinien mierzyć też zdarzenia analityczne.</p>
+            </div>
+            <span class="status-note">PLN / miesiąc</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="orders">Liczba zamówień miesięcznie</label>
+              <input id="orders" name="orders" type="number" min="0" step="10" value="1000">
+              <span class="hint">Wszystkie kanały sprzedaży razem.</span>
+            </div>
+            <div class="field">
+              <label for="minutes">Czas ręczny na zamówienie</label>
+              <input id="minutes" name="minutes" type="number" min="0" step="0.5" value="4">
+              <span class="hint">W minutach, średnio na jedno zamówienie.</span>
+            </div>
+            <div class="field">
+              <label for="hourCost">Koszt godziny pracy</label>
+              <input id="hourCost" name="hourCost" type="number" min="0" step="5" value="60">
+              <span class="hint">Pełny koszt operacyjny, nie tylko wypłata.</span>
+            </div>
+            <div class="field">
+              <label for="errors">Liczba błędów miesięcznie</label>
+              <input id="errors" name="errors" type="number" min="0" step="1" value="20">
+              <span class="hint">Poprawki adresów, faktur, statusów, paczek.</span>
+            </div>
+            <div class="field">
+              <label for="errorCost">Średni koszt błędu</label>
+              <input id="errorCost" name="errorCost" type="number" min="0" step="5" value="40">
+              <span class="hint">Czas naprawy, kontakt, koszt operacyjny.</span>
+            </div>
+            <div class="field">
+              <label for="delays">Opóźnienia lub wyjątki</label>
+              <input id="delays" name="delays" type="number" min="0" step="1" value="10">
+              <span class="hint">Sprawy wymagające wyjaśnienia.</span>
+            </div>
+            <div class="field">
+              <label for="delayCost">Koszt jednej sprawy</label>
+              <input id="delayCost" name="delayCost" type="number" min="0" step="5" value="80">
+              <span class="hint">Czas zespołu i potencjalny koszt klienta.</span>
+            </div>
+            <div class="field">
+              <label for="toolCost">Koszt narzędzia miesięcznie</label>
+              <input id="toolCost" name="toolCost" type="number" min="0" step="50" value="300">
+              <span class="hint">Abonament systemu, integracji lub automatyzacji.</span>
+            </div>
+            <div class="field">
+              <label for="controlCost">Kontrola wyjątków po automatyzacji</label>
+              <input id="controlCost" name="controlCost" type="number" min="0" step="50" value="500">
+              <span class="hint">Czas człowieka zostawiony na decyzje.</span>
+            </div>
+            <div class="field">
+              <label for="implementationCost">Jednorazowy koszt wdrożenia</label>
+              <input id="implementationCost" name="implementationCost" type="number" min="0" step="500" value="5000">
+              <span class="hint">Konfiguracja, testy, dokumentacja.</span>
+            </div>
+            <div class="field full">
+              <label for="automationPercent">Jaki procent kosztu da się realnie usunąć?</label>
+              <div class="range-line">
+                <input id="automationPercent" name="automationPercent" type="range" min="0" max="90" step="5" value="50">
+                <input id="automationPercentValue" type="number" min="0" max="90" step="5" value="50" aria-label="Procent automatyzacji">
+              </div>
+              <span class="hint">Nie zakładaj 100%. Wyjątki i kontrola zwykle zostają.</span>
+            </div>
+          </div>
+        </form>
+
+        <aside class="panel result-panel" aria-live="polite">
+          <div id="scoreStrip" class="score-strip high">
+            <div class="score-label">Koszt ręcznego procesu</div>
+            <div class="score" id="manualCost">0 PLN</div>
+            <div class="score-sub" id="scoreMessage">Liczymy wynik...</div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><span>Koszt roczny</span><strong id="annualCost">0 PLN</strong></div>
+            <div class="metric"><span>Oszczędność netto</span><strong id="netSavings">0 PLN</strong></div>
+            <div class="metric"><span>Zwrot wdrożenia</span><strong id="payback">-</strong></div>
+            <div class="metric"><span>Koszt po automatyzacji</span><strong id="afterCost">0 PLN</strong></div>
+          </div>
+          <div class="chart-wrap">
+            <div class="bars" aria-label="Podział kosztów">
+              <div class="bar-row">
+                <span>Praca</span>
+                <span class="bar-track"><span id="workBar" class="bar"></span></span>
+                <span id="workCost" class="bar-value">0 PLN</span>
+              </div>
+              <div class="bar-row">
+                <span>Błędy</span>
+                <span class="bar-track"><span id="errorBar" class="bar errors"></span></span>
+                <span id="errorsCost" class="bar-value">0 PLN</span>
+              </div>
+              <div class="bar-row">
+                <span>Wyjątki</span>
+                <span class="bar-track"><span id="delayBar" class="bar delays"></span></span>
+                <span id="delaysCost" class="bar-value">0 PLN</span>
+              </div>
+            </div>
+          </div>
+          <div class="result-copy">
+            <p id="recommendation">Na tych liczbach automatyzacja może mieć sens finansowy, jeśli obejmie powtarzalne kroki i zostawi człowiekowi tylko wyjątki.</p>
+          </div>
+          <div class="result-actions">
+            <a id="primaryCta" class="button teal" href="#lead">Poproś o listę 3 automatyzacji</a>
+            <a id="secondaryCta" class="button secondary" href="#pakiet">Pobierz pakiet ROI</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="co-liczymy" class="section">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Co składa się na koszt obsługi zamówienia?</h2>
+          <p>Sam czas pakowania to za mało. W praktyce koszt robią poprawki, wyjątki, faktury, statusy i ręczne przepisywanie między systemami.</p>
+        </div>
+        <div class="columns">
+          <article class="info-card">
+            <h3>Praca ręczna</h3>
+            <p>Każde zamówienie ma koszt w minutach: sprawdzenie płatności, status, etykieta, faktura, wiadomość do klienta.</p>
+          </article>
+          <article class="info-card">
+            <h3>Błędy i poprawki</h3>
+            <p>Zły adres, błędna faktura, zdublowany status lub opóźniona reakcja zwykle kosztują więcej niż sam klik.</p>
+          </article>
+          <article class="info-card">
+            <h3>Wyjątki</h3>
+            <p>Automatyzacja nie powinna usuwać człowieka z decyzji. Powinna pokazywać wyjątki wcześniej i taniej.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Co automatyzować najpierw?</h2>
+          <p>Najpierw wybieraj kroki częste, powtarzalne i mało ryzykowne. Nie zaczynaj od spornych reklamacji ani decyzji finansowych.</p>
+        </div>
+        <div class="columns">
+          <article class="info-card">
+            <h3>Raport wyjątków</h3>
+            <ul>
+              <li>zamówienia opóźnione,</li>
+              <li>brak numeru śledzenia,</li>
+              <li>brak faktury lub statusu.</li>
+            </ul>
+          </article>
+          <article class="info-card">
+            <h3>Tagowanie zamówień</h3>
+            <ul>
+              <li>kanał sprzedaży,</li>
+              <li>wartość lub ryzyko,</li>
+              <li>sprawy wymagające człowieka.</li>
+            </ul>
+          </article>
+          <article class="info-card">
+            <h3>Szablony i statusy</h3>
+            <ul>
+              <li>mniej ręcznych maili,</li>
+              <li>szybsza informacja do klienta,</li>
+              <li>mniej chaosu w zespole.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pakiet" class="section">
+      <div class="shell cta-grid">
+        <div class="offer">
+          <span class="eyebrow">Produkt cyfrowy MVP</span>
+          <h2>Pakiet ROI automatyzacji e-commerce</h2>
+          <div class="price">79-99 PLN</div>
+          <p>Arkusz ROI, checklista 30 punktów, mapa procesu i lista pierwszych automatyzacji. Do testu sprzedaży zanim zbudujesz większy produkt.</p>
+          <a id="productCta" class="button teal" href="/pakiet-roi-automatyzacji-ecommerce/">Zobacz zawartość pakietu</a>
+        </div>
+        <div id="lead" class="lead-form">
+          <h2>Zgłoś proces do analizy</h2>
+          <p class="status-note">Formularz prototypowy. W produkcji podłącz go do CRM, maila lub narzędzia formularzy.</p>
+          <form id="leadForm">
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" type="email" placeholder="kontakt@firma.pl" required>
+            </div>
+            <div class="field">
+              <label for="monthlyOrdersLead">Zamówienia miesięcznie</label>
+              <input id="monthlyOrdersLead" type="number" min="0" placeholder="np. 1000">
+            </div>
+            <div class="field">
+              <label for="tools">Używane narzędzia</label>
+              <input id="tools" type="text" placeholder="Base.com, Allegro, InPost, księgowość...">
+            </div>
+            <div class="field">
+              <label for="problem">Największy problem</label>
+              <textarea id="problem" placeholder="Co dziś robicie ręcznie i gdzie najczęściej coś się psuje?"></textarea>
+            </div>
+            <label class="checkbox">
+              <input type="checkbox" required>
+              <span>Wyrażam zgodę na kontakt w sprawie przesłanego wyniku kalkulatora i opisanego procesu. Wynik kalkulatora jest szacunkiem, nie wyceną wdrożenia.</span>
+            </label>
+            <button class="button" type="submit">Wyślij wynik do analizy</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section alt">
+      <div class="shell">
+        <div class="section-head">
+          <h2>FAQ</h2>
+          <p>Najczęstsze pytania przed podjęciem decyzji, czy automatyzacja zamówień ma sens.</p>
+        </div>
+        <details>
+          <summary>Ile kosztuje obsługa jednego zamówienia w sklepie internetowym?</summary>
+          <p>Najprościej policzyć czas ręczny na zamówienie, koszt godziny pracy oraz koszt błędów i wyjątków. W wielu firmach dopiero suma tych elementów pokazuje realny koszt.</p>
+        </details>
+        <details>
+          <summary>Kiedy automatyzacja zamówień się opłaca?</summary>
+          <p>Gdy powtarzalna ręczna praca i błędy kosztują więcej niż narzędzie, utrzymanie i wdrożenie w rozsądnym okresie zwrotu. Kalkulator pokazuje szacowany payback.</p>
+        </details>
+        <details>
+          <summary>Czy Base.com lub BaseLinker wystarczy do automatyzacji?</summary>
+          <p>Często tak, jeśli problem jest prostą regułą. Jeśli chodzi o wyjątki, raporty, KSeF, kilka systemów lub kontrolę błędów, zwykle trzeba najpierw uporządkować proces.</p>
+        </details>
+        <details>
+          <summary>Co automatyzować najpierw?</summary>
+          <p>Raport wyjątków, statusy, tagowanie, etykiety, szablony wiadomości i walidację danych. Nie zaczynaj od decyzji spornych lub prawno-finansowych.</p>
+        </details>
+        <details>
+          <summary>Czy wynik kalkulatora jest wyceną?</summary>
+          <p>Nie. To model decyzyjny oparty na wpisanych założeniach. Przed wdrożeniem trzeba sprawdzić rzeczywisty proces, dane, wyjątki i ryzyka.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <p>Prototyp publikowalnego assetu SEO. Przed produkcją ustaw prawidłowy canonical, politykę prywatności, obsługę formularza, płatność produktu i zdarzenia analityczne.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const launchConfig = {
+      formEndpoint: "",
+      leadFormUrl: "",
+      productCheckoutUrl: "",
+      analyticsSource: "kalkulator_kosztu_obslugi_zamowien"
+    };
+
+    const queryConfig = new URLSearchParams(window.location.search);
+    ["formEndpoint", "leadFormUrl", "productCheckoutUrl"].forEach((key) => {
+      const value = queryConfig.get(key);
+      if (value) {
+        launchConfig[key] = value;
+      }
+    });
+
+    const pln = new Intl.NumberFormat("pl-PL", {
+      style: "currency",
+      currency: "PLN",
+      maximumFractionDigits: 0
+    });
+
+    const fields = {
+      orders: document.getElementById("orders"),
+      minutes: document.getElementById("minutes"),
+      hourCost: document.getElementById("hourCost"),
+      errors: document.getElementById("errors"),
+      errorCost: document.getElementById("errorCost"),
+      delays: document.getElementById("delays"),
+      delayCost: document.getElementById("delayCost"),
+      toolCost: document.getElementById("toolCost"),
+      controlCost: document.getElementById("controlCost"),
+      implementationCost: document.getElementById("implementationCost"),
+      automationPercent: document.getElementById("automationPercent"),
+      automationPercentValue: document.getElementById("automationPercentValue")
+    };
+
+    const output = {
+      strip: document.getElementById("scoreStrip"),
+      manualCost: document.getElementById("manualCost"),
+      annualCost: document.getElementById("annualCost"),
+      netSavings: document.getElementById("netSavings"),
+      payback: document.getElementById("payback"),
+      afterCost: document.getElementById("afterCost"),
+      workCost: document.getElementById("workCost"),
+      errorsCost: document.getElementById("errorsCost"),
+      delaysCost: document.getElementById("delaysCost"),
+      workBar: document.getElementById("workBar"),
+      errorBar: document.getElementById("errorBar"),
+      delayBar: document.getElementById("delayBar"),
+      scoreMessage: document.getElementById("scoreMessage"),
+      recommendation: document.getElementById("recommendation"),
+      primaryCta: document.getElementById("primaryCta"),
+      secondaryCta: document.getElementById("secondaryCta"),
+      productCta: document.getElementById("productCta")
+    };
+
+    let currentResult = null;
+    let calculatorStarted = false;
+    let calculatorCompleted = false;
+    let lastTrackedTier = null;
+
+    function track(eventName, data = {}) {
+      const payload = {
+        event: eventName,
+        asset: launchConfig.analyticsSource,
+        ...data
+      };
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(payload);
+
+      if (typeof window.gtag === "function") {
+        window.gtag("event", eventName, data);
+      }
+    }
+
+    function value(id) {
+      const parsed = Number(fields[id].value);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+    }
+
+    function tier(manualCost) {
+      if (manualCost < 500) {
+        return {
+          className: "low",
+          label: "Niski koszt procesu",
+          message: "Na tych liczbach pełna automatyzacja prawdopodobnie nie jest priorytetem.",
+          recommendation: "Zacznij od checklist, szablonów odpowiedzi i prostych automatyzacji w obecnym narzędziu.",
+          cta: "Pobierz checklistę porządkowania",
+          target: "#pakiet"
+        };
+      }
+      if (manualCost < 2000) {
+        return {
+          className: "medium",
+          label: "Średni koszt procesu",
+          message: "Tu warto zacząć od prostych usprawnień.",
+          recommendation: "Sprawdź statusy, szablony, automatyczne etykiety, powiadomienia i raport wyjątków.",
+          cta: "Pobierz pakiet arkuszy ROI",
+          target: "#pakiet"
+        };
+      }
+      if (manualCost < 8000) {
+        return {
+          className: "high",
+          label: "Wysoki koszt procesu",
+          message: "Automatyzacja może mieć sens finansowy.",
+          recommendation: "Najpierw obejmij powtarzalne kroki i zostaw człowiekowi wyjątki.",
+          cta: "Poproś o listę 3 automatyzacji",
+          target: "#lead"
+        };
+      }
+      return {
+        className: "very-high",
+        label: "Bardzo wysoki koszt procesu",
+        message: "Brak uporządkowanego procesu prawdopodobnie kosztuje firmę realne pieniądze.",
+        recommendation: "Warto sprawdzić, gdzie są wyjątki, błędy, ręczne przepisywanie i ryzyko faktur/statusów.",
+        cta: "Zgłoś proces do audytu",
+        target: "#lead"
+      };
+    }
+
+    function calculate() {
+      const workCost = value("orders") * value("minutes") / 60 * value("hourCost");
+      const errorsCost = value("errors") * value("errorCost");
+      const delaysCost = value("delays") * value("delayCost");
+      const manualCost = workCost + errorsCost + delaysCost;
+      const automationShare = value("automationPercent") / 100;
+      const grossSavings = manualCost * automationShare;
+      const afterCost = Math.max(0, manualCost - grossSavings + value("toolCost") + value("controlCost"));
+      const netSavings = manualCost - afterCost;
+      const payback = netSavings > 0 ? value("implementationCost") / netSavings : null;
+      const maxCost = Math.max(workCost, errorsCost, delaysCost, 1);
+      const currentTier = tier(manualCost);
+      currentResult = {
+        orders: value("orders"),
+        manualCost: Math.round(manualCost),
+        annualCost: Math.round(manualCost * 12),
+        netSavings: Math.round(netSavings),
+        afterCost: Math.round(afterCost),
+        paybackMonths: payback === null ? null : Number(payback.toFixed(1)),
+        tier: currentTier.className
+      };
+
+      output.strip.className = "score-strip " + currentTier.className;
+      output.manualCost.textContent = pln.format(manualCost);
+      output.annualCost.textContent = pln.format(manualCost * 12);
+      output.netSavings.textContent = netSavings > 0 ? pln.format(netSavings) + "/mies." : "brak zwrotu";
+      output.payback.textContent = payback === null ? "nie zwraca się" : payback.toFixed(1).replace(".", ",") + " mies.";
+      output.afterCost.textContent = pln.format(afterCost);
+      output.workCost.textContent = pln.format(workCost);
+      output.errorsCost.textContent = pln.format(errorsCost);
+      output.delaysCost.textContent = pln.format(delaysCost);
+      output.workBar.style.width = Math.round(workCost / maxCost * 100) + "%";
+      output.errorBar.style.width = Math.round(errorsCost / maxCost * 100) + "%";
+      output.delayBar.style.width = Math.round(delaysCost / maxCost * 100) + "%";
+      output.scoreMessage.textContent = currentTier.message;
+      output.recommendation.textContent = netSavings > 0 ? currentTier.recommendation : "Automatyzacja w tych założeniach się nie zwraca. Najpierw popraw proces albo sprawdź, czy wolumen jest za mały.";
+      output.primaryCta.textContent = currentTier.cta;
+      output.primaryCta.href = currentTier.target;
+      fields.automationPercentValue.value = fields.automationPercent.value;
+
+      document.getElementById("monthlyOrdersLead").value = fields.orders.value;
+    }
+
+    Object.entries(fields).forEach(([id, field]) => {
+      field.addEventListener("input", () => {
+        if (!calculatorStarted) {
+          calculatorStarted = true;
+          track("calculator_started");
+        }
+        if (id === "automationPercentValue") {
+          fields.automationPercent.value = field.value;
+        }
+        if (id === "automationPercent") {
+          fields.automationPercentValue.value = field.value;
+        }
+        calculate();
+        if (!calculatorCompleted) {
+          calculatorCompleted = true;
+          track("calculator_completed", currentResult);
+        }
+        if (currentResult && currentResult.tier !== lastTrackedTier) {
+          lastTrackedTier = currentResult.tier;
+          track("result_" + currentResult.tier.replace("-", "_"), currentResult);
+        }
+      });
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3600);
+    }
+
+    function handleProductClick(event) {
+      track("product_checkout_clicked", currentResult || {});
+      if (launchConfig.productCheckoutUrl) {
+        event.preventDefault();
+        window.location.href = launchConfig.productCheckoutUrl;
+      }
+    }
+
+    function handleCtaClick(event) {
+      const target = event.currentTarget.getAttribute("href");
+      track(target === "#pakiet" ? "cta_product_clicked" : "cta_lead_clicked", currentResult || {});
+    }
+
+    function buildLeadFormUrl(payload) {
+      const target = new URL(launchConfig.leadFormUrl, window.location.href);
+      const params = {
+        email: payload.email,
+        monthlyOrders: payload.monthlyOrders,
+        tools: payload.tools,
+        problem: payload.problem,
+        manualCost: payload.result ? payload.result.manualCost : "",
+        annualCost: payload.result ? payload.result.annualCost : "",
+        netSavings: payload.result ? payload.result.netSavings : "",
+        paybackMonths: payload.result ? payload.result.paybackMonths : "",
+        tier: payload.result ? payload.result.tier : ""
+      };
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          target.searchParams.set(key, value);
+        }
+      });
+
+      return target.toString();
+    }
+
+    output.primaryCta.addEventListener("click", handleCtaClick);
+    output.secondaryCta.addEventListener("click", handleCtaClick);
+    output.productCta.addEventListener("click", handleProductClick);
+
+    document.getElementById("leadForm").addEventListener("input", () => {
+      track("lead_form_started", currentResult || {});
+    }, { once: true });
+
+    document.getElementById("leadForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const payload = {
+        email: document.getElementById("email").value.trim(),
+        monthlyOrders: document.getElementById("monthlyOrdersLead").value,
+        tools: document.getElementById("tools").value.trim(),
+        problem: document.getElementById("problem").value.trim(),
+        result: currentResult,
+        submittedAt: new Date().toISOString()
+      };
+      track("lead_form_submitted", currentResult || {});
+
+      if (!launchConfig.formEndpoint) {
+        if (launchConfig.leadFormUrl) {
+          window.location.href = buildLeadFormUrl(payload);
+          return;
+        }
+
+        showToast("Formularz jest gotowy technicznie. Wstaw formEndpoint albo leadFormUrl, aby zaczął wysyłać leady.");
+        console.info("Lead payload preview", payload);
+        return;
+      }
+
+      try {
+        const response = await fetch(launchConfig.formEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        event.target.reset();
+        document.getElementById("monthlyOrdersLead").value = fields.orders.value;
+        showToast("Dzięki. Wynik kalkulatora został wysłany do analizy.");
+      } catch (error) {
+        showToast("Nie udało się wysłać formularza. Sprawdź endpoint lub ustawienia CORS.");
+      }
+    });
+
+    calculate();
+  </script>
+</body>
+</html>
+

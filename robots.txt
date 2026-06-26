@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://itmminfo.github.io/sitemap.xml
